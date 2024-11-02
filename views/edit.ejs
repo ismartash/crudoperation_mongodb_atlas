@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit User</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #ffffff;
+      padding: 20px;
+    }
+
+    .water-drop {
+      background: rgba(71, 144, 201, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+      padding: 40px;
+      width: 500px;
+      animation: morphing 10s infinite;
+      box-shadow: 
+        0 20px 50px rgba(71, 144, 201, 0.2),
+        inset 0 0 50px rgba(255, 255, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .water-drop::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle, 
+          rgba(255,255,255,0.5) 0%, 
+          rgba(71, 144, 201, 0.2) 30%,
+          transparent 70%);
+      animation: rotate 15s linear infinite;
+    }
+
+    @keyframes morphing {
+      0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+      25% { border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%; }
+      50% { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; }
+      75% { border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%; }
+      100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+    }
+
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    h1 {
+      color: #1a365d;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 28px;
+      font-weight: 600;
+      position: relative;
+      text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+      position: relative;
+      z-index: 1;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #1a365d;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid rgba(71, 144, 201, 0.3);
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.7);
+      color: #1a365d;
+    }
+
+    input:focus {
+      border-color: #1a365d;
+      background: rgba(255, 255, 255, 0.9);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+    }
+
+    .form-group:focus-within label {
+      color: #1a365d;
+      transform: translateY(-2px);
+    }
+
+    .submit-btn {
+      background: #1a365d;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      width: 100%;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .submit-btn:hover {
+      background: #2c4a7c;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(26, 54, 93, 0.2);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .error-message {
+      background: rgba(255, 118, 117, 0.9);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+      animation: slideIn 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .success-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(46, 204, 113, 0.95);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 24px;
+      animation: fadeIn 0.3s ease;
+      z-index: 100;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Add subtle shine effect */
+    .water-drop::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.2) 0%,
+        transparent 50%,
+        rgba(71, 144, 201, 0.1) 100%
+      );
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="water-drop">
+    <h1>Edit User</h1>
+    <% if (user) { %>
+      <form action="/users/<%= user._id %>/update" method="post" id="editForm">
+        <div class="form-group">
+          <label for="firstname">First Name</label>
+          <input 
+            type="text" 
+            id="firstname"
+            name="firstname" 
+            value="<%= user.firstname %>" 
+            required
+            autocomplete="given-name"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="lastname">Last Name</label>
+          <input 
+            type="text" 
+            id="lastname"
+            name="lastname" 
+            value="<%= user.lastname %>" 
+            required
+            autocomplete="family-name"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input 
+            type="email" 
+            id="email"
+            name="email" 
+            value="<%= user.email %>" 
+            required
+            autocomplete="email"
+          >
+        </div>
+
+        <button type="submit" class="submit-btn">
+          <span>Update Profile</span>
+        </button>
+      </form>
+    <% } else { %>
+      <div class="error-message">
+        <p>User not found.</p>
+      </div>
+    <% } %>
+  </div>
+
+  <div class="success-overlay" id="successOverlay">
+    <div>Profile Updated Successfully! ✨</div>
+  </div>
+
+  <script>
+    document.getElementById('editForm')?.addEventListener('submit', function(e) {
+      const button = this.querySelector('.submit-btn');
+      const span = button.querySelector('span');
+      span.textContent = 'Updating...';
+      
+      // Simulate success for demo (remove in production)
+      setTimeout(() => {
+        document.getElementById('successOverlay').style.display = 'flex';
+      }, 1000);
+    });
+
+    // Add ripple effect to button
+    document.querySelector('.submit-btn')?.addEventListener('click', function(e) {
+      const ripple = document.createElement('div');
+      ripple.style.cssText = `
+        position: absolute;
+        background: rgba(255,255,255,0.3);
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        left: ${e.offsetX - 50}px;
+        top: ${e.offsetY - 50}px;
+        pointer-events: none;
+        transform: scale(0);
+        transition: transform 0.4s ease;
+      `;
+      
+      this.appendChild(ripple);
+      requestAnimationFrame(() => {
+        ripple.style.transform = 'scale(4)';
+        ripple.style.opacity = '0';
+      });
+
+      setTimeout(() => ripple.remove(), 400);
+    });
+
+    // Enhance form interactions
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.classList.add('focused');
+      });
+
+      input.addEventListener('blur', function() {
+        if (!this.value) {
+          this.parentElement.classList.remove('focused');
+        }
+      });
+
+      if (input.value) {
+        input.parentElement.classList.add('focused');
+      }
+    });
+  </script>
+</body>
+</html>
